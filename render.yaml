@@ -4,7 +4,7 @@ services:
     env: python
     plan: free
     buildCommand: pip install -r backend/requirements.txt
-    startCommand: cd backend && uvicorn main:app --host 0.0.0.0 --port $PORT
+    startCommand: cd backend && python -m uvicorn main:app --host 0.0.0.0 --port $PORT --log-level info --timeout-keep-alive 65
     envVars:
       - key: POE_API_KEY
         value: sk-poe--tSp8vvoUtXd9SfFaY5MqXkNQcD9lZ4kSdPSncUpwHg
