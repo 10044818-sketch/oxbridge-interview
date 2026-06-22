@@ -1,0 +1,20 @@
+# 敏感文件
+backend/.env
+backend/oxbridge.db
+backend/__pycache__/
+backend/*.pyc
+
+# Node
+frontend/node_modules/
+frontend/dist/
+
+# 构建缓存
+*.pyc
+__pycache__/
+*.db-shm
+*.db-wal
+
+# IDE
+.vscode/
+.idea/
+*.swp
