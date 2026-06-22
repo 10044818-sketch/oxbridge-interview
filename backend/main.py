@@ -29,13 +29,21 @@ app.add_middleware(
 
 @app.on_event("startup")
 def startup():
-    init_db()
-    from seed import seed_db
-    db = SessionLocal()
     try:
-        seed_db(db)
-    finally:
-        db.close()
+        init_db()
+        from seed import seed_db
+        db = SessionLocal()
+        try:
+            seed_db(db)
+        finally:
+            db.close()
+        print("✅ 数据库初始化完成")
+    except Exception as e:
+        print(f"⚠️ 数据库初始化警告（不影响启动）: {e}")
+
+@app.get("/health")
+def health_check():
+    return {"status": "ok", "service": "Oxbridge Interview Tutor"}
 
 class LoginRequest(BaseModel):
     username: str
