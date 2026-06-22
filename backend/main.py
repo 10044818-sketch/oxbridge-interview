@@ -6,7 +6,7 @@ load_dotenv()  # 从 .env 文件加载环境变量
 from fastapi import FastAPI, Depends, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, Response
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 from datetime import datetime, timezone
@@ -266,22 +266,25 @@ async def ws_interview(websocket: WebSocket, session_id: int):
     except WebSocketDisconnect:
         ws_manager.disconnect(websocket, session_id)
 
-# ===== 前端静态文件服务 =====
+# ===== 前端静态文件服务（必须在所有 /api 路由之后） =====
 import os
+import mimetypes
 
 STATIC_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static")
 
-# 挂载静态资源（assets/ 等）
-if os.path.exists(STATIC_DIR):
-    app.mount("/assets", StaticFiles(directory=os.path.join(STATIC_DIR, "assets")), name="assets")
-
-# SPA 兜底：所有非 /api 路由返回 index.html
+# SPA 兜底：所有非 /api 路由先检查是否为静态文件，否则返回 index.html
 @app.get("/{full_path:path}")
 async def serve_spa(full_path: str):
-    file_path = os.path.join(STATIC_DIR, full_path)
-    if os.path.exists(file_path) and os.path.isfile(file_path):
-        return FileResponse(file_path)
-    # SPA 兜底
+    # 安全防护：禁止目录穿越
+    safe_path = os.path.normpath(full_path)
+    if safe_path.startswith(".."):
+        return Response(status_code=404)
+
+    file_path = os.path.join(STATIC_DIR, safe_path)
+    if os.path.isfile(file_path):
+        media_type, _ = mimetypes.guess_type(file_path)
+        return FileResponse(file_path, media_type=media_type)
+    # SPA 兜底：返回 index.html（让 React Router 处理）
     index_path = os.path.join(STATIC_DIR, "index.html")
     if os.path.exists(index_path):
         return FileResponse(index_path)

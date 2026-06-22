@@ -4,6 +4,11 @@ backend/oxbridge.db
 backend/__pycache__/
 backend/*.pyc
 
+# 压缩包和构建产物
+*.tar.gz
+*.zip
+oxbridge-interview/
+
 # Node
 frontend/node_modules/
 frontend/dist/
