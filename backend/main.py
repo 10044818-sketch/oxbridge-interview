@@ -272,6 +272,14 @@ import mimetypes
 
 STATIC_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static")
 
+# 根路径
+@app.get("/")
+async def root():
+    index_path = os.path.join(STATIC_DIR, "index.html")
+    if os.path.exists(index_path):
+        return FileResponse(index_path)
+    return {"error": "前端文件未找到，请先构建前端"}
+
 # SPA 兜底：所有非 /api 路由先检查是否为静态文件，否则返回 index.html
 @app.get("/{full_path:path}")
 async def serve_spa(full_path: str):
