@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta, timezone
 from typing import Optional
-from jose import JWTError, jwt
+import jwt
 import hashlib
 import secrets
 from fastapi import Depends, HTTPException, status
@@ -42,7 +42,7 @@ def get_current_user(
         username = payload.get("sub")
         if not username:
             raise HTTPException(status_code=401, detail="Invalid token")
-    except JWTError:
+    except jwt.InvalidTokenError:
         raise HTTPException(status_code=401, detail="Invalid token")
     user = db.query(User).filter(User.username == username).first()
     if not user:
