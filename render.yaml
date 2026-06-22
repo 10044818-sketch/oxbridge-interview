@@ -3,15 +3,10 @@ services:
     name: oxbridge-interview
     env: python
     plan: free
-    buildCommand: |
-      cd backend && pip install -r requirements.txt && \
-      cd ../frontend && npm install && npm run build && \
-      cp -r dist/* ../backend/static/
+    buildCommand: cd backend && pip install -r requirements.txt
     startCommand: cd backend && uvicorn main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: POE_API_KEY
-        sync: false
+        value: sk-poe--tSp8vvoUtXd9SfFaY5MqXkNQcD9lZ4kSdPSncUpwHg
       - key: DATABASE_URL
         value: oxbridge.db
-      - key: PYTHON_VERSION
-        value: 3.9
